@@ -1,0 +1,78 @@
+extends layout
+
+block content
+  h1= title
+
+  p Enter Table Name to query:
+
+  input(type="text",id="TableName")
+
+  input(type="button",id="QueryTable",value="Query Entities")
+  p Query Entities is issued directly from JavaScript against Windows Azure Storage using JSON
+
+
+
+
+  div(id="metrics-table-container")
+    table(id="metrics-table",class="table table-condensed table-striped")
+
+
+block scripts
+  script(src="/scripts/drawtable.js")
+  script.
+
+        // Sets the required headers on the request.
+        // xhr: the XML http requests
+        function setHeader(xhr) {
+            xhr.setRequestHeader('x-ms-version', '2013-08-15');
+            xhr.setRequestHeader('MaxDataServiceVersion', '3.0');
+            xhr.setRequestHeader('Accept', 'application/json;odata=nometadata');
+
+        }
+
+        // Query the table data from windows azure storage.
+        // tableSasUrl: the SAS url obtained from 
+        function queryTable(tableSasUrl) {
+            $.ajax({
+                type: 'GET',
+                datatype: "json",
+                url: tableSasUrl,
+                beforeSend: setHeader,
+                // Render the table with all the entities if the request succeeds
+                success: drawTable,
+                error: function (res, status, xhr) {
+                    alert("can't get the data for the specified table");
+                }
+            });
+        }
+        
+        // This function calls into the server side to get the table SAS url and then 
+        // pass it to queryTable function in order to query Windows Azure Storage and render the table
+        function renderTable() {
+            if (!Date.now) {
+                Date.now = function() { return new Date().getTime(); }
+            }
+        
+            var ts = Date.now() / 1000 | 0;
+            
+            var tableName = document.getElementById("TableName").value;
+            var tableSasActionUri = "/getTableSasUrl" + "?tableName=" + tableName + "&ts=" + ts; //workaround to avoid browser cache
+
+            $.ajax({
+                type: 'GET',
+                url: tableSasActionUri,
+                success: function (res, status, xhr) {
+                    // Use the table SAS url to query windows azure storage.
+                    queryTable(xhr.responseText);
+                },
+                error: function (res, status, xhr) {
+                    alert("can't get SAS for table");
+                }
+
+            });
+        }
+
+        document.getElementById('QueryTable').addEventListener('click', renderTable, false);
+
+        $("#mainContainer").css("width", "auto");
+        $("#mainContainer").css("margin", "0 15px");

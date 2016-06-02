@@ -1,0 +1,36 @@
+﻿doctype html
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport", content="width=device-width")
+    title= title + '- Windows Azure Storage Node CORS example'
+    link(href="/favicon.ico", rel="shortcut icon", type="image/x-icon")
+    link(rel='stylesheet', href='/stylesheets/site.css')
+  body
+    header
+      div(class="content-wrapper")
+        div(class="float-left")
+          p(class="site-title") Windows Azure Storage Node CORS example
+        
+        div(class="float-right")
+          nav
+            ul(id="menu")
+              li
+                a(href="/") Upload Image
+              li
+                a(href="/listBlobs") List Blobs
+              li
+                a(href="/insertTableEntities") Insert Table Entities
+              li
+                a(href="/queryTableEntities") Query Table Entities
+    div(id="body")
+      block featured
+        section(class="content-wrapper main-content clear-fix")
+          block content
+    
+    footer
+      div(class="content-wrapper")
+        div(class="float-left")
+
+        script(src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.8.0.js")
+        block scripts

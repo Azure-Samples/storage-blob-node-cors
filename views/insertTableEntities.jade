@@ -1,0 +1,148 @@
+extends layout
+
+block content
+  h1= title
+  
+  p Enter a table name to create
+  input(type="text", id="TableName")
+
+  input(type="button", id="CreateTable", value="CreateTable")
+  p Note that table creation is proxied through the service and is not a direct Windows Azure Storage request from JavaScript.
+
+  label(id="tableStatus", style="background-color:lightyellow")
+
+  p Enter Entity Details:
+  table(id="dataTable", width="350", border="1")
+    tr
+      td  1 
+      td 
+        input(type="text", id="key1", value="PartitionKey", disabled="disabled")
+      td 
+        input(type="text", id="val1") 
+    tr
+      td 2 
+      td 
+        input(type="text", id="key2", value="RowKey", disabled)
+      td 
+        input(type="text", id="val2")
+        
+  input(type="button", value="Add a new property", onclick="addEntity('dataTable')")
+
+  input(type="button", id="SaveChanges", value="Insert Entity", onclick="saveChanges('dataTable')")
+
+  p Insert Entity is done through an AJAX request directly against Windows Azure Storage using SAS.
+
+
+  script.
+  
+    var inputcount = 3;
+    function addEntity(tableID) {
+        var table = document.getElementById(tableID);
+        var rowCount = table.rows.length;
+        var row = table.insertRow(rowCount);
+
+        var cell2 = row.insertCell(0);
+        cell2.innerHTML = rowCount + 1;
+
+        var cell1 = row.insertCell(1);
+        var element1 = document.createElement("input");
+        element1.type = "text";
+        element1.name = "name";
+        element1.id = "key" + inputcount;
+        cell1.appendChild(element1);
+
+        var cell3 = row.insertCell(2);
+        var element2 = document.createElement("input");
+        element2.type = "text";
+        element2.name = "value";
+        element2.id = "val" + inputcount;
+        cell3.appendChild(element2);
+
+        inputcount++;
+    }
+
+    function createTableIfNotExists() {
+        var createTableUri = "/createTableIfNotExists" + "?tableName=" + document.getElementById("TableName").value;
+
+        // This ajax call goes to the server side of the website to create the table.
+        $.ajax({
+            type: 'POST',
+            url: createTableUri,
+            success: function (res, status, xhr) {
+                document.getElementById("tableStatus").innerHTML = xhr.responseText;
+            },
+            error: function (res, status, xhr) {
+                document.getElementById("tableStatus").innerHTML = xhr.responseText;
+            }
+        });
+    }
+
+    // Saves the changes by adding the required table entity to the table or changing the existing entity
+    function saveChanges(tableID) {
+
+        if (!Date.now) {
+            Date.now = function() { return new Date().getTime(); }
+        }
+        
+        var ts = Date.now() / 1000 | 0;
+        
+        var tableName = document.getElementById("TableName").value;
+        var tableSasActionUri = "/getTableSasUrl" + "?tableName=" + tableName + "&ts=" + ts; //workaround for avoiding browser cache
+        if (tableName == "") {
+            alert("please enter table name");
+            return;
+        }
+
+        function setHeader(xhr) {
+            xhr.setRequestHeader('x-ms-version', '2013-08-15');
+            xhr.setRequestHeader('MaxDataServiceVersion', '3.0');
+            xhr.setRequestHeader('Accept', 'application/json;odata=nometadata');
+            xhr.setRequestHeader('Content-Type', 'application/json;odata=nometadata');
+        }
+
+        // This function sends a request to windows azure storage to add table entities
+        // using table SAS, this request is a CORS request.
+        function addTableEntity(jsonString, tableSasUrl) {
+            $.ajax({
+                type: 'POST',
+                datatype: "json",
+                data: jsonString,
+                url: tableSasUrl,
+                beforeSend: setHeader,
+                success: function (res, status, xhr) {
+                    alert("Updated the table using ajax");
+                },
+                error: function (res, status, xhr) {
+                    alert("Failed in updating the table");
+                }
+            });
+        }
+
+        var table = document.getElementById(tableID);
+        var rowCount = table.rows.length;
+        var dict = {};
+
+        for (var i = 1; i < rowCount + 1; i++) {
+            var key = document.getElementById("key" + i).value;
+            var value = document.getElementById("val" + i).value;
+            dict[key] = value;
+        }
+
+        $.ajax({
+            type: 'GET',
+            url: tableSasActionUri,
+            success: function (res, status, xhr) {
+                // Called into GetTableSas to generate the SAS for the specified table with all pk and rk ranges 
+                if (xhr.responseText != "") {
+                    addTableEntity(JSON.stringify(dict), xhr.responseText);
+                }
+                else {
+                    alert("failed to generate the SAS for the specified table");
+                }
+            }
+        });
+
+
+    }
+
+    document.getElementById('CreateTable').addEventListener('click', createTableIfNotExists, false);

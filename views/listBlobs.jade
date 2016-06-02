@@ -1,0 +1,62 @@
+﻿extends layout
+
+block content
+  h1= title
+  p List all Blobs (as Images) in the container '#{containerName}'
+  input(type="button",id="ListContainerBlobs",value="List Blobs")
+  
+  p Once you click on the button, Javascript will issue a 
+    a(target="_blank",href="http://msdn.microsoft.com/en-us/library/windowsazure/dd135734.aspx") List Blobs
+  p request, parses the result and displays the images below
+  
+  div(id="ImageContainer")
+
+    script.
+        function ListBlobs() {
+            var listBlobUrl = "#{url}" + "?restype=container&comp=list";
+            $.ajax({
+                type: 'GET',
+                url: listBlobUrl,
+                success: function (res, status, xhr) {
+                    imageDiv = document.getElementById("ImageContainer");
+
+                    // remove the current pictures if any.
+                    while (imageDiv.firstChild) {
+                        imageDiv.removeChild(imageDiv.firstChild);
+                    }
+                    try {
+                        // We use XMLDOM for internet explorer
+                        var dom = new ActiveXObject("Microsoft.XMLDOM");
+                        dom.loadXML(xhr.responseText);
+                        picArray = dom.selectNodes("//Name");
+
+                        // iterate through the pictures and display them accordingly.
+                        for (var i = 0; i < picArray.length; i++) {
+                            var newImg = document.createElement("img");
+                            newImg.src = urlBase + "/" + picArray[i].text;
+                            imageDiv.appendChild(newImg);
+                        }
+                    }
+                    catch (e) {
+                        // We fallback to xml document evaluation logic if XMLDOC is not supported
+                        blobNameXmlLocation = "/EnumerationResults/Blobs/Blob/Name";
+                        xmlDoc = xhr.responseXML;
+                        var result = xmlDoc.evaluate(blobNameXmlLocation, xmlDoc, null, XPathResult.UNORDERED_NODE_ITERATOR_TYPE, null);
+                        var link;
+                        while (link = result.iterateNext()) {
+                            var newImg = document.createElement("img");
+                            newImg.src = "#{url}" + "/" + link.textContent;
+                            imageDiv.appendChild(newImg);
+                        }
+                    }
+
+                },
+                error: function (res, status, xhr) {
+                    alert("Couldn't get blob list");
+                }
+            });
+        }
+
+        document.getElementById('ListContainerBlobs').addEventListener('click', ListBlobs, false);
+
+

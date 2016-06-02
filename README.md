@@ -1,10 +1,3 @@
-# storage-blob-node-cors
-This sample demostrates how to set the CORS rules for a blob storage account to be used from javascript in a web browser
-## Running this sample
-Coming soon...
-## Deploy this sample to Azure
-Coming soon...
-## About the code
-Coming soon...
-## More information
-Coming soon...
+﻿# NodeSample
+
+
