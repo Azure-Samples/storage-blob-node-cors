@@ -5,12 +5,9 @@ block content
 
   p Select image files that you would like to upload
   input(type="file", id="files", name="files[]", multiple="multiple")
-  p The files will be uploaded as BlockBlob into your Windows Azure Storage account '#{accountName}'
-        and container '#{containerName}'.
-
-        The upload is done through Javascript where the code will first request a SAS token from the service for the container and then uploads all the selected files directly into Windows Azure Storage.
-
-        The images will start appearing below as they are uploaded.
+  p The files will be uploaded as BlockBlob into your Windows Azure Storage using the container '#{containerName}'.
+  p The upload is done through Javascript where the code will first request a SAS token from the service for the container and then uploads all the selected files directly into Windows Azure Storage.
+  p The images will start appearing below as they are uploaded.
     
   output(id="list")
   div(id="uploadedImage",class="row")
