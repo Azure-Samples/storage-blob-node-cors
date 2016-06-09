@@ -96,6 +96,7 @@ function setCors(callback) {
   var blobService = storage.createBlobService(cn);
   var tableService = storage.createTableService(cn);
 
+  // This sample will overwrite any existing CORS rules in the service properties. No cleanup is done after the sample is run. 
   blobService.getServiceProperties(function (error, properties) {
     if (error) return callback(error);
 

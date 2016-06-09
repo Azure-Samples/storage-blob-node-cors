@@ -9,6 +9,8 @@ This sample demostrates how to enable Cors for the Blob Storage and Table servic
 If you don't have a Microsoft Azure subscription you can
 get a FREE trial account [here](http://go.microsoft.com/fwlink/?LinkId=330212)
 
+**Note: This sample will overwrite any existing CORS rules in the Azure Subscription you use. No cleanup is done after the sample is run.**
+
 ## Running this sample
 
 This sample can be run using either the Azure Storage Emulator that installs as part of the Azure SDK (In Windows only) - or by

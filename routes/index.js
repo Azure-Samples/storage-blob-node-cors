@@ -41,15 +41,12 @@ router.get('/getBlobSasUrl', function (req, res) {
 
   var blockBlobName = "demoblockblob-" + req.query.blobName;
 
-  var startDate = new Date();
-  var expiryDate = new Date(startDate);
-  expiryDate.setMinutes(startDate.getMinutes() + 1000);
-  startDate.setMinutes(startDate.getMinutes() - 1000);
+  var expiryDate = new Date();
+  expiryDate.setMinutes(expiryDate.getMinutes() + 30);
 
   var sharedAccessPolicy = {
     AccessPolicy: {
       Permissions: storage.BlobUtilities.SharedAccessPermissions.READ + storage.BlobUtilities.SharedAccessPermissions.WRITE + storage.BlobUtilities.SharedAccessPermissions.LIST,
-      Start: startDate,
       Expiry: expiryDate
     },
   };
@@ -73,10 +70,8 @@ router.get('/getTableSasUrl', function (req, res) {
 
   var tableName = req.query.tableName;
 
-  var startDate = new Date();
-  var expiryDate = new Date(startDate);
-  expiryDate.setMinutes(startDate.getMinutes() + 1000);
-  startDate.setMinutes(startDate.getMinutes() - 1000);
+  var expiryDate = new Date();
+  expiryDate.setMinutes(expiryDate.getMinutes() + 30);
 
   var sharedAccessPolicy = {
     AccessPolicy: {
@@ -84,7 +79,6 @@ router.get('/getTableSasUrl', function (req, res) {
       + storage.TableUtilities.SharedAccessPermissions.ADD
       + storage.TableUtilities.SharedAccessPermissions.UPDATE
       + storage.TableUtilities.SharedAccessPermissions.DELETE,
-      Start: startDate,
       Expiry: expiryDate
     },
   };
@@ -113,27 +107,19 @@ router.post('/createTableIfNotExists', function (req, res) {
   var cn = config.connectionString;
   var tableService = storage.createTableService(cn);
 
-  tableService.doesTableExist(tableName, function (error, result, response) {
-    if (error) {
+  tableService.createTableIfNotExists(tableName, function(error, result) {
+    if(error) {
       res.send(error);
       return;
     }
-
-    if (result.exists) {
+    
+    if(result.created) {
+      res.send('Table created');
+    } else{
       res.send('Table ' + tableName + ' already exists');
       return;
     }
-
-    tableService.createTable(tableName, function (error, result, response) {
-      if (error) {
-        res.send(error);
-      }
-      else {
-        res.send('Table created');
-      }
-    });
-  });
-
+  })
 });
 
 module.exports = router;
