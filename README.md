@@ -27,14 +27,16 @@ To run the sample using the Storage Emulator (Azure SDK):
 1. Download and Install the Azure Storage Emulator [here](http://azure.microsoft.com/en-us/downloads/).
 2. Start the Azure Storage Emulator (once only) by pressing the Start button or the Windows key and searching for it by typing "Azure Storage Emulator". Select it from the list of applications to start it.
 3. Open the app.config file and set the configuration for the emulator ("useDevelopmentStorage":true).
-4. Run the sample by: node ./app.js
+4. Download the dependencies with *npm install*.
+5. Run the sample by: node ./app.js
 
 To run the sample using the Storage Service
 
 1. Open the app.config file and set the connection string for the emulator ("useDevelopmentStorage":false) and set the connection string for the storage service ("connectionString":"...")
 2. Create a Storage Account through the Azure Portal
 3. Provide your connection string for the storage service ("connectionString":"...") in the app.config file. 
-4. Run the sample by: node ./app.js
+4. Download the dependencies with *npm install*.
+5. Run the sample by: node ./app.js
 
 ## More information
 - [Introducing Cors](https://blogs.msdn.microsoft.com/windowsazurestorage/2014/02/03/windows-azure-storage-introducing-cors/)
