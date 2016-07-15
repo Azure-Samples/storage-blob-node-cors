@@ -1,4 +1,10 @@
-﻿# Getting Started with Cors for the Windows Azure Storage Services in Node.js
+---
+services: storage
+platforms: nodejs
+author: dineshmurthy
+---
+
+﻿# Getting Started with CORS for the Windows Azure Storage Services in Node.js
 
 Cross-origin resource sharing (CORS) is a mechanism that allows restricted resources on a web page to be requested from another domain outside the domain from which the resource originated.
 This sample demostrates how to enable Cors for the Blob Storage and Table services in Windows Azure, a how to perform the following tasks,
